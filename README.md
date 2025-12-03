@@ -1,47 +1,31 @@
-## 📊 Workflow 功能說明
-這個 workflow 是一個 AI 內容分析器，使用 Groq 的 AI 模型來自動分析文字內容並提取關鍵資訊。
+# 🧠 AI Content Atomization Assistant (AI 內容原子化分析助手)
 
-## 🔄 工作流程
-1️⃣ Manual Trigger（手動觸發）
-你點擊按鈕來啟動整個流程
-不需要外部 API 呼叫或 webhook
-2️⃣ Workflow Configuration（工作流程設定）
-集中管理所有設定參數：
-maxSummaryLength: 摘要最大長度（500 字元）
-emailRecipient: 郵件收件人（選用）
-content: 你要分析的文字內容（可以隨時修改）
-3️⃣ AI Content Analyzer（AI 內容分析器）
-這是核心節點，使用 AI 來分析文字，執行以下任務：
+這是一個自動化內容分析工具，利用 **Streamlit** 作為前端介面，並透過 **n8n** 自動化流程串接 **Groq AI** 模型。
+它可以將長篇文章快速轉化為結構化的洞察報告，包括摘要、情緒傾向、關鍵標籤與核心觀點。
 
-📝 生成簡潔摘要（最多 500 字元）
-🏷️ 提取關鍵主題
-😊😐😞 識別情感（正面/中性/負面）
-💡 提取關鍵洞察
-連接的 AI 組件：
+## ✨ 功能特色
+- **自動摘要**：利用 AI 快速提煉文章重點。
+- **情緒分析**：偵測文章的正向、負向或中立情緒。
+- **結構化輸出**：自動提取關鍵主題 (Topics) 與核心洞察 (Key Insights)。
+- **無縫整合**：前後端分離架構，透過 Webhook 即時溝通。
 
-Groq Chat Model: 使用 llama-3.3-70b-versatile 模型進行分析
-Structured Output Parser: 確保輸出格式化為標準 JSON
-Gmail Tool: 可選功能，如果你在文字中要求，AI 可以發送分析結果到指定郵箱
-## 📤 輸出結果
-執行完成後，你會得到結構化的 JSON 結果：
+## 🛠️ 技術棧
+- **Frontend**: Python, Streamlit
+- **Automation**: n8n (Self-hosted)
+- **AI Model**: Groq (Llama-3.3-70b-versatile)
+- **Communication**: RESTful Webhook (JSON)
 
-{
-  "summary": "內容摘要...",
-  "topics": ["主題1", "主題2", "主題3"],
-  "sentiment": "positive",
-  "keyInsights": ["洞察1", "洞察2"]
-}
-## 💡 使用場景
-這個 workflow 適合用於：
+## 🚀 安裝與設定
 
-📰 新聞文章分析
-📧 郵件內容摘要
-📱 社群媒體貼文分析
-📄 文件快速理解
-🎯 客戶反饋情感分析
-## ✏️ 如何使用
-點擊 Workflow Configuration 節點
-修改 content 欄位為你想分析的文字
-點擊 Test workflow 按鈕
-查看 AI Content Analyzer 節點的輸出結果
-完全在 n8n 介面內操作，不需要寫程式或外部工具！
+### 1. n8n 設定
+1. 將 `workflow.json` 匯入 n8n。
+2. 設定 **Groq API** 憑證。
+3. 修改 **Webhook 節點**，確保 Response Mode 設為 `Using 'Respond to Webhook' Node`。
+4. 開啟 workflow 右上角的 **Active** 開關 (正式模式)。
+5. 複製 **Production Webhook URL**。
+
+### 2. Python 環境設定
+確保已安裝 Python 3.8+，然後執行：
+
+```bash
+pip install -r requirements.txt
