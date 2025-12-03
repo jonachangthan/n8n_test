@@ -1,0 +1,173 @@
+{
+  "name": "AI Content Atomization (Groq Fixed)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "77a34ba1-e90d-47b2-8b5b-327d74680411",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [1536, 2096]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "maxSummaryLength",
+              "value": 500,
+              "type": "number"
+            },
+            {
+              "id": "id-2",
+              "name": "emailRecipient",
+              "value": "<__PLACEHOLDER_VALUE__Email address to send results__>",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "content",
+              "value": "繼2021年62大產業平均月薪之後，104玩數據將29萬筆薪資資料，依年齡、不依職務／學經歷／地區／主管及非主管等完整排序，提出以下五大發現：  發現一：年資有價 絕大多數產業薪資，會因為年齡增加而水漲船高，每一世代薪資增長逾兩成。發現二：年資燙金 電腦及消費性電子製造業、顧問／研發／設計、金融業、電信通訊業，這四大產業年資不是包袱，連跨兩個世代，每個世代的薪資增幅在26%~35%不等。觀察三：跨世代常勝軍  半導體、電腦及消費性電子製造業、以及軟體及網路業，穩居三世代平均月薪前四強，投資理財業、金融業各分齡坐五望四。  104玩數據公布2021年62大產業「分齡」平均月薪TOP 10產業： 觀察四：年輕衝一波 30歲以下年輕族群中，運輸業平均月薪41,159元、排名第3，郵政及快遞業38,245元、排名第9，因「求供比」高，平均每1位求職者可分得3份相關工作，相對好入手。薪資結構多以底薪加趟次等各式獎金，多靠工時累積，逢年過節大量送禮需求影響休假，也得承受搬重物的潛在風險。用體力和時間，換取高額薪酬。  觀察五：步步高升   英雄不怕出身低！住宿服務、不動產、零售業的薪資排名隨年齡增加而往前。　  民生消費產業隨工作年資而累積人脈、口碑和實戰經驗，薪資排名年輕時的敬陪末座，到中壯年後已晉升中段班、甚至前十名。",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "all",
+        "options": {}
+      },
+      "id": "bd8b0e11-4999-43ec-8f76-957bc00f2ae0",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1760, 2096]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "id": "103eda07-ae48-4332-af40-a500aced5a49",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [1984, 2320],
+      "credentials": {
+        "groqApi": {
+          "id": "YOUR_GROQ_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $fromAI('recipient') }}",
+        "subject": "={{ $fromAI('subject') }}",
+        "emailType": "html",
+        "message": "={{ $fromAI('message') }}",
+        "options": {}
+      },
+      "id": "40a6fa7a-dac9-40ef-9b4d-6a84b9ff5f8b",
+      "name": "Gmail Tool",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [2112, 2320],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"summary\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"Concise summary of the content\"\n\t\t},\n\t\t\"topics\": {\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"string\"\n\t\t\t},\n\t\t\t\"description\": \"List of key topics identified\"\n\t\t},\n\t\t\"sentiment\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"Overall sentiment: positive, negative, or neutral\"\n\t\t},\n\t\t\"keyInsights\": {\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"string\"\n\t\t\t},\n\t\t\t\"description\": \"Main insights extracted from the content\"\n\t\t}\n\t}\n}",
+        "autoFix": false
+      },
+      "id": "00b168e0-d4b3-4df8-af5d-b5b02a4f3a17",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [2240, 2320]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an AI content analyzer that processes text and extracts key insights.\n\nYour task is to:\n1. Analyze the provided content\n2. Generate a concise summary (max {{ $('Workflow Configuration').first().json.maxSummaryLength }} characters)\n3. Extract key topics and themes\n4. Identify the main sentiment (positive, negative, neutral)\n5. If the user requests to send results via email, use the Gmail Tool to send the analysis\n\nReturn your analysis in the structured JSON format defined by the output parser."
+        }
+      },
+      "id": "7b8dd9b5-d712-4a0c-b728-6704fc921bc6",
+      "name": "AI Content Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [2040, 2096]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "AI Content Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Content Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Content Analyzer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Content Analyzer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
