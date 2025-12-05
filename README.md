@@ -48,3 +48,6 @@ streamlit run app.py
 
 
 <img width="1865" height="924" alt="result" src="https://github.com/user-attachments/assets/40ff0664-f55e-4069-a17e-6be6866c5710" />
+
+## Streamlit Web
+https://ai-article-emotion-summary-analyzer-tool-4xvzpctqtqdruapw8rkmj.streamlit.app/
